@@ -1,0 +1,259 @@
+from typing import List, Generator, Iterator, Dict, Tuple, DefaultDict, Callable
+from contextlib import suppress
+from collections import defaultdict
+from dataclasses import dataclass, field
+import logging as log
+import sys
+
+
+if '--debug' in sys.argv:
+    print('running in debug mode')
+    log.basicConfig(level=log.DEBUG)
+else:
+    log.basicConfig(level=log.INFO)
+
+FILE_PATH = './test_data/INF_18_10B.pdf'
+RAW_PATH = './test_data/raw_text.txt'
+
+TABLE_STARTS = ['Liczba', 'Zapad.']
+GROUP_TYPE_NAME = 'razem'
+SUBTABLE_STARTS = [GROUP_TYPE_NAME, 'ogółem']
+HYPHEN = "â€“"
+DATALEN = 4
+LINE_OFFSET = 4
+
+
+class ParsingException(Exception):
+    pass
+
+
+class CursorException(Exception):
+    pass
+
+
+def parsefloat(value: str) -> float:
+    return float(value.replace(',', '.').replace(' ', ''))
+
+
+@dataclass
+class Cursor:
+    data: List[str]
+    position: int = 0
+
+    @property
+    def val(self) -> str:
+        return self.data[self.position]
+
+    def index_value(self, index: int) -> int:
+        return int(self.data[index])
+
+    def next_integer_value_between(self, mindistance: int, maxdistance: int) -> Tuple[int, int]:
+        for index in range(mindistance, maxdistance):
+            try:
+                val = self.index_value(index)
+                yield index, val
+            except ValueError:
+                continue
+        raise CursorException('Could not find next table row.')
+
+    def all_lines(self, beginning):
+        while True:
+            local_cursor = 0
+            beginval = self.index_value(beginning)
+            for end, endval in self.next_integer_value_between(beginning + LINE_OFFSET, beginning + LINE_OFFSET + 7):
+                if endval == beginval + 1:
+                    break
+            log.debug(f'DISTANCE: {end-beginning}')
+            yield self.data[beginning:end]
+            beginning = end
+        # end = beginning + LINE_OFFSET
+        # while True:
+        #     beginval = self.index_value(beginning)
+        #     try:
+        #         endval = self.index_value(end)
+        #     except ValueError:
+        #         end += 1
+        #         continue
+        #
+        #     assert beginval + 1 == endval, f'{self.data[beginning:end]}'
+        #     yield self.data[beginning:end]
+        #     beginning = end
+
+    def lines(self, num: int) -> List[str]:
+        return self.data[self.position:self.position+num]
+
+    def subtable_line(self) -> Tuple[str, List[float]]:
+        lines = self.lines(DATALEN + 1)
+        subcategory, values = lines[0], [parsefloat(l) for l in lines[1:]]
+
+        return subcategory, values
+
+    def move(self, steps: int):
+        for _ in range(steps):
+            self.position += 1
+            log.debug(f"## POS: {self.position}: {self.val}")
+
+    def __iadd__(self, other: int):
+        assert other > 0
+
+        self.move(other)
+        return self
+
+    def __isub__(self, other: int):
+        self.position -= other
+        log.debug(f'jumping back by {other}')
+        log.debug(f"## POS:  {self.position}: {self.val}")
+        return self
+
+
+@dataclass
+class Sickness:
+    index: int
+    values: DefaultDict[str, List[float]] = field(default_factory=lambda: defaultdict(list))
+
+
+sicknesses: List[Sickness] = []
+
+
+def add_sickness(sickness: Sickness):
+    log.debug(f'New sickness: {sickness}')
+    if sicknesses:
+        excpected = sicknesses[-1].index + 1
+        if not excpected == sickness.index:
+            raise ParsingException(
+                f'{sickness} has wrong index. Expected {sicknesses[-1].index}, found {sickness.index}'
+            )
+
+    for val in sickness.values.values():
+        if len(val) != DATALEN:
+            raise ParsingException(
+                f'{sickness} has wrong amount of values. Expected {DATALEN}, '
+                f'found {len(sickness.values)} '
+                f'({sickness.values})'
+            )
+
+    sicknesses.append(sickness)
+
+
+def replace_hyphens_with_zeroes(lines: List[str]) -> List[str]:
+    parsed_lines = []
+    for line in [line.strip() for line in lines if line.strip()]:
+        if HYPHEN in line:
+            buffer = []
+            while line[:3] == HYPHEN:
+                # log.debug(f'hyphen detected in {line}, setting value to zero')
+                # log.debug(f'{buffer}')
+                buffer.append(0.0)
+                line = line[3:]
+            for val in buffer:
+                parsed_lines.append(str(val))
+        else:
+            parsed_lines.append(line)
+
+    return parsed_lines
+
+
+def join_broken_text(lines: List[str]) -> List[str]:
+    parsed: List[str] = lines[:]
+    while True:
+        for index, (line1, line2) in enumerate(zip(parsed, parsed[1:])):
+            if line1[0].istitle() and line2[0].isalpha():
+                parsed[index:index+2] = [line1 + line2]
+            else:
+                print(line1, line2)
+        return parsed
+
+
+def read_file(path: str) -> List[str]:
+    lines = []
+    with open(path) as f:
+        raw_lines = [line for line in f.readlines()]
+        raw_lines = replace_hyphens_with_zeroes(raw_lines)
+        raw_lines = join_broken_text(raw_lines)
+
+
+    return raw_lines
+
+
+def parse_hyphened_line(line: str) -> List[float]:
+    values: List[float] = []
+    while line[:3] == HYPHEN:
+        log.debug(f'hyphen detected in {line}, setting value to zero')
+        log.debug(f'{values}')
+        values.append(0.0)
+        line = line[3:]
+    log.debug('done parsing')
+    assert not line
+
+    return values
+
+
+def parse_subtable_lines(cursor: Cursor) -> DefaultDict[str, List[float]]:
+    parsed_sicknesses = defaultdict(list)
+    while True:
+        subcategory, values = cursor.subtable_line()
+        if not subcategory.isalpha():
+            break
+        parsed_sicknesses[subcategory] = values
+        cursor += DATALEN + 2
+
+    return parsed_sicknesses
+
+
+def parse_file(path: str):
+    lines = read_file(path)
+    from pprint import pprint
+    pprint(lines)
+    exit()
+    cursor = Cursor(lines)
+
+    for line in cursor.all_lines(4):
+        print(line)
+        # break
+        # exit()
+    # print(cursor)
+    # while cursor < len(lines):
+    # while cursor.position < 50:
+    #     cursor += 1
+    #
+    #     if cursor.val in TABLE_STARTS:
+    #         cursor += 3
+    #
+    #     log.debug(f'setting index to {cursor.val}')
+    #     index = int(cursor.val)
+    #     sickness = Sickness(index)
+    #     cursor += 1
+    #
+    #     try:
+    #         for line in cursor.lines(DATALEN):
+    #             sickness.values[GROUP_TYPE_NAME].append(parsefloat(line))
+    #         cursor += DATALEN - 1
+    #         log.debug('done parsing a line')
+    #
+    #     except ValueError:
+    #         if cursor.val in SUBTABLE_STARTS:
+    #             sickness.values = parse_subtable_lines(cursor)
+    #         else:
+    #             sickness.values[GROUP_TYPE_NAME] += parse_hyphened_line(cursor.val)
+    #         # cursor += 1
+    #
+    #     # sickness = Sickness(index, values)
+    #     add_sickness(sickness)
+
+
+def main():
+    parse_file(RAW_PATH)
+
+
+if __name__ == '__main__':
+    import tabula
+    pdf = tabula.read_pdf(FILE_PATH)
+    source, target = FILE_PATH, FILE_PATH[:-4] + '.csv'
+    tabula.convert_into(FILE_PATH, FILE_PATH[:-4] + '.csv', output_format="csv")
+    import csv
+
+    with open(target) as csvfile:
+        reader = csv.reader(csvfile, delimiter=' ')
+        for row in reader:
+            print(', '.join(row))
+

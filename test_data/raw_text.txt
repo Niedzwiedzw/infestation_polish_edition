@@ -1,0 +1,1272 @@
+
+Liczba
+Zapad.
+Liczba
+Zapad.
+1
+––––
+2
+2
+0,01
+7
+0,02
+3
+4
+0,01
+2
+0,01
+4
+razem
+8 662
+22,54
+8 646
+22,50
+5
+zatrucie pokarmowe 
+UE/PL
+8 409
+21,89
+8 403
+21,87
+6
+posocznica 
+PL
+150
+0,39
+137
+0,36
+7
+inne zaka
+ż
+enie pozajelitowe 
+PL
+103
+0,27
+106
+0,28
+8
+253
+0,66
+29
+0,08
+9
+razem
+13 227
+34,43
+13 405
+34,89
+10
+wywo
+ł
+ane przez 
+E. coli
+ biegunkotwórcz
+ą
+PL
+234
+0,61
+225
+0,59
+11
+wywo
+ł
+ane przez 
+E. coli
+ enterokrwotoczn
+ą
+UE
+6
+0,02
+4
+0,01
+12
+wywo
+ł
+ane przez 
+E. coli
+ inn
+ą
+ i BNO
+232
+0,60
+257
+0,67
+13
+wywo
+ł
+ane przez 
+Campylobacter
+UE
+604
+1,57
+723
+1,88
+14
+wyw. przez 
+Y.enterocolitica
+ lub 
+pseudotuberculosis
+ UE
+156
+0,41
+151
+0,39
+15
+wywo
+ł
+ane przez 
+Clostridium difficile
+10 046
+26,15
+10 062
+26,19
+16
+inne okre
+ś
+lone
+596
+1,55
+647
+1,68
+17
+nie okre
+ś
+lone
+1 353
+3,52
+1 336
+3,48
+18
+1 272
+166,75
+1 313
+172,12
+19
+razem
+482
+1,25
+435
+1,13
+20
+gronkowcowe
+65
+0,17
+48
+0,12
+21
+jadem kie
+ł
+basianym (botulizm) 
+UE/PL
+21
+0,05
+22
+0,06
+22
+wywo
+ł
+ane przez 
+C. perfringens
+1
+0,00
+1
+0,00
+23
+inne okre
+ś
+lone
+8
+0,02
+5
+0,01
+24
+nie okre
+ś
+lone
+387
+1,01
+359
+0,93
+25
+22
+2,88
+31
+4,06
+26
+753
+1,96
+1 040
+2,71
+27
+3
+0,01
+7
+0,02
+28
+razem
+40 693
+105,91
+48 908
+127,29
+29
+wywo
+ł
+ane przez rotawirusy
+20 586
+53,58
+30 960
+80,58
+30
+wywo
+ł
+ane przez norowirusy
+4 302
+11,20
+2 308
+6,01
+31
+inne okre
+ś
+lone
+4 236
+11,02
+3 251
+8,46
+32
+nie okre
+ś
+lone
+11 569
+30,11
+12 389
+32,24
+33
+18 100
+2 372,77
+20 970
+2 749,00
+34
+ogó
+ł
+em
+47 836
+124,50
+46 307
+120,52
+35
+w tym u dzieci do lat 2
+14 314
+1 876,45
+13 714
+1 797,80
+36
+––––
+37
+14
+0,04
+22
+0,06
+Wirusowe zaka
+ż
+enia 
+jelitowe (ogó
+ł
+em)
+Giardioza (lamblioza) 
+UE
+Kryptosporydioza 
+UE
+Wirusowe zaka
+ż
+enia jelitowe u dzieci do lat 2
+Biegunka i zapalenie 
+ż
+o
+łą
+dkowo-jelit. BNO
+D
+ż
+uma 
+UE
+Tularemia 
+UE
+Zachorowania na wybrane choroby zaka
+ź
+ne w Polsce od 1 stycznia do 31 pa
+ź
+dziernika 2018 r.
+oraz w porównywalnym okresie 2017 r.
+Liczba zachorowa
+ń
+ i zapadalno
+ść
+ na 100 tys. ludno
+ś
+ci *
+Lp.
+Jednostka chorobowa
+1.01-31.10.2018 r.
+1.01-31.10.2017 r.
+Cholera 
+UE
+Dur brzuszny
+ UE
+Dury rzekome A, B, C 
+UE
+Czerwonka bakteryjna (szigeloza) 
+UE
+Inne bakteryjne zaka
+ż
+enia jelitowe u dzieci do lat 2
+Inne bakteryjne zatrucia pokarmowe u dzieci do lat 2
+Inne bakteryjne 
+zaka
+ż
+enia jelitowe 
+(ogó
+ł
+em)
+Salmoneloza
+Inne bakteryjne 
+zatrucia pokarmowe 
+(ogó
+ł
+em)
+Zak
+ł
+ad Epidemiologii Chorób Zaka
+ź
+nych i Nadzoru NIZP-PZH       Departament Zapobiegania oraz Zwalczania Zaka
+ż
+e
+ń
+ i Chorób Zaka
+ź
+nych u Ludzi GIS
+Liczba
+Zapad.
+Liczba
+Zapad.
+Lp.
+Jednostka chorobowa
+1.01-31.10.2018 r.
+1.01-31.10.2017 r.
+38
+––––
+39
+––––
+40
+––––
+41
+6
+0,02
+1
+0,00
+42
+30
+0,08
+54
+0,14
+43
+204
+0,53
+240
+0,62
+44
+99
+0,26
+101
+0,26
+45
+ogó
+ł
+em
+7
+0,02
+11
+0,03
+46
+noworodków
+––––
+47
+––––
+48
+1 293
+3,37
+2 629
+6,84
+49
+14 518
+37,79
+12 991
+33,81
+50
+ogó
+ł
+em
+161
+0,42
+192
+0,50
+51
+zapalenie opon mózgowych i/lub mózgu
+76
+0,20
+101
+0,26
+52
+posocznica
+112
+0,29
+136
+0,35
+53
+inna okre
+ś
+lona i nie okre
+ś
+lona
+5
+0,01
+4
+0,01
+54
+ogó
+ł
+em
+4 948
+12,88
+4 577
+11,91
+55
+ró
+ż
+a
+4 803
+12,50
+4 438
+11,55
+56
+zespó
+ł
+ wstrz
+ą
+su toksycznego
+18
+0,05
+15
+0,04
+57
+gor
+ą
+czka po
+ł
+ogowa
+1
+0,25
+1
+0,25
+58
+inna okre
+ś
+lona i nie okre
+ś
+lona
+129
+0,34
+125
+0,33
+59
+choroba legionistów 
+UE/PL
+62
+0,16
+24
+0,06
+60
+gor
+ą
+czka Pontiac 
+PL
+3
+0,01
+–
+–
+61
+13
+3,23
+8
+1,99
+62
+razem
+919
+2,39
+1 355
+3,53
+63
+wczesna
+479
+1,25
+710
+1,85
+64
+pó
+ź
+na
+71
+0,18
+72
+0,19
+65
+inne postacie ki
+ł
+y i ki
+ł
+a nie okre
+ś
+lona
+369
+0,96
+573
+1,49
+66
+185
+0,48
+250
+0,65
+67
+––––
+68
+238
+0,62
+212
+0,55
+69
+17 003
+44,25
+17 596
+45,80
+70
+–
+–
+1
+0,00
+71
+––––
+72
+––––
+73
+5
+0,01
+4
+0,01
+74
+wywo
+ł
+ane dzikim wirusem
+––––
+75
+wyw. wirusem pochodzenia szczepionkowego
+––––
+76
+36
+0,62
+46
+0,79
+77
+choroba Creutzfeldta-Jacoba (CJD) 
+PL
+24
+0,06
+18
+0,05
+78
+wariant choroby Creutzfeldta-Jacoba (vCJD) 
+UE
+––––
+79
+inne i nie okre
+ś
+lone
+––––
+Ki
+ł
+a wrodzona i noworodków 
+UE/PL
+Ki
+ł
+a 
+UE/PL
+W
+ą
+glik 
+UE
+Bruceloza: nowe zachorowania 
+UE
+Nosacizna 
+PL
+Leptospiroza 
+UE
+Jersinioza pozajelitowa 
+PL
+Mikobakteriozy - inne i BNO
+Listerioza 
+UE
+T
+ęż
+ec 
+UE
+B
+ł
+onica 
+UE
+Krztusiec 
+UE
+P
+ł
+onica (szkarlatyna) 
+PL
+Choroba 
+meningokokowa, 
+inwazyjna 
+UE/PL
+Choroba wywo
+ł
+ana 
+przez 
+Streptococcus 
+pyogenes
+, 
+inwazyjna 
+PL
+Legioneloza
+Rze
+żą
+czka 
+UE/PL
+Ziarnica weneryczna wywo
+ł
+ana przez Chlamydie 
+UE/PL
+Inne choroby przenoszone drog
+ą
+ p
+ł
+ciow
+ą
+ wywo
+ł
+ane przez Chlamydie
+ UE/PL
+Borelioza z Lyme 
+PL
+Ornitozy (zaka
+ż
+enia 
+Chlamydia psittaci
+)
+Dur wysypkowy
+Gor
+ą
+czka Q 
+UE
+Gor
+ą
+czka plamista i inne riketsjozy
+Poliomyelitis 
+UE/PL
+Ostre pora
+ż
+enia wiotkie u dzieci w wieku 0-14 lat
+Encefalopatie 
+g
+ą
+bczaste
+Liczba
+Zapad.
+Liczba
+Zapad.
+Lp.
+Jednostka chorobowa
+1.01-31.10.2018 r.
+1.01-31.10.2017 r.
+80
+––––
+81
+6 403
+16,66
+7 081
+18,43
+82
+151
+0,39
+202
+0,53
+83
+opryszczkowe
+13
+0,03
+18
+0,05
+84
+inne okre
+ś
+lone
+3
+0,01
+6
+0,02
+85
+nie okre
+ś
+lone
+74
+0,19
+67
+0,17
+86
+w innych chorobach obj
+ę
+tych MZ-56
+9
+0,02
+10
+0,03
+87
+enterowirusowe
+90
+0,23
+52
+0,14
+88
+opryszczkowe
+2
+0,01
+4
+0,01
+89
+inne okre
+ś
+lone i nie okre
+ś
+lone
+933
+2,43
+581
+1,51
+90
+w innych chorobach obj
+ę
+tych MZ-56
+5
+0,01
+8
+0,02
+91
+25
+0,07
+27
+0,07
+92
+––––
+93
+––––
+94
+Ebola, Marburg, Lassa
+––––
+95
+inna okre
+ś
+lona i nie okre
+ś
+lona
+––––
+96
+8
+0,02
+9
+0,02
+97
+118 880
+309,40
+143 869
+374,44
+98
+––––
+99
+144
+0,37
+59
+0,15
+100
+403
+1,05
+412
+1,07
+101
+––––
+102
+typu A 
+UE
+1 139
+2,96
+2 162
+5,63
+103
+typu B - ostre 
+UE/PL
+29
+0,08
+49
+0,13
+104
+typu B - przewlek
+ł
+e i BNO 
+UE/PL
+2 705
+7,04
+2 712
+7,06
+105
+typu C 
+UE
+2 884
+7,51
+3 334
+8,68
+106
+typu B+C (zaka
+ż
+enie mieszane)
+15
+0,04
+25
+0,07
+107
+inne i nie okre
+ś
+lone
+9
+0,02
+10
+0,03
+108
+104
+0,27
+90
+0,23
+109
+1 002
+2,61
+1 259
+3,28
+110
+1 240
+3,23
+1 410
+3,67
+111
+29
+0,08
+18
+0,05
+112
+43
+0,11
+61
+0,16
+113
+3
+0,01
+–
+–
+114
+1
+0,00
+9
+0,02
+115
+ogó
+ł
+em
+1 003
+2,61
+878
+2,29
+116
+zapalenie opon mózgowych i/lub mózgu
+166
+0,43
+139
+0,36
+117
+posocznica
+679
+1,77
+602
+1,57
+118
+inna okre
+ś
+lona i nie okre
+ś
+lona
+396
+1,03
+342
+0,89
+119
+4
+0,01
+2
+0,01
+W
+ś
+cieklizna 
+UE
+Styczno
+ść
+ i nara
+ż
+enie na w
+ś
+cieklizn
+ę
+ / potrzeba szczepie
+ń
+Kleszczowe zapalenia mózgu 
+UE
+Inne wirusowe 
+zapalenie mózgu
+Wirusowe zapalenie 
+opon mózgowych
+Gor
+ą
+czka denga (klasyczna lub krwotoczna) 
+PL
+Gor
+ą
+czka zachodniego Nilu 
+UE
+Ż
+ó
+ł
+ta gor
+ą
+czka 
+UE
+Wirusowe gor
+ą
+czki 
+krwotoczne 
+UE
+Choroba wywo
+ł
+ana przez hantawirusy 
+PL
+Ospa wietrzna
+Ospa prawdziwa 
+UE
+Odra 
+UE
+Ró
+ż
+yczka 
+UE
+Pryszczyca
+Wirusowe zapalenie 
+w
+ą
+troby
+AIDS - Zespó
+ł
+ nabytego upo
+ś
+ledzenia odporno
+ś
+ci 
+UE/PL
+Nowowykryte zaka
+ż
+enia HIV 
+UE
+Ś
+winka (nagminne zapalenie przyusznic) 
+UE
+Malaria (zimnica) 
+UE
+B
+ą
+blowica (echinokokoza) 
+UE
+W
+ą
+grzyca (cysticerkoza)
+W
+ł
+o
+ś
+nica 
+UE
+Choroba wywo
+ł
+ana 
+przez 
+Streptococcus 
+pneumoniae
+, 
+inwazyjna 
+UE
+Zespó
+ł
+ hemolityczno-mocznicowy w przebiegu zaka
+ż
+enia 
+E. coli
+UE
+Liczba
+Zapad.
+Liczba
+Zapad.
+Lp.
+Jednostka chorobowa
+1.01-31.10.2018 r.
+1.01-31.10.2017 r.
+120
+ogó
+ł
+em
+98
+0,26
+94
+0,24
+121
+zapalenie opon mózgowych i/lub mózgu
+5
+0,01
+8
+0,02
+122
+posocznica
+51
+0,13
+48
+0,12
+123
+inna okre
+ś
+lona i nie okre
+ś
+lona
+54
+0,14
+50
+0,13
+124
+w innych chorobach obj
+ę
+tych MZ-56
+151
+0,39
+173
+0,45
+125
+inne okre
+ś
+lone
+104
+0,27
+103
+0,27
+126
+inne, nie okre
+ś
+lone
+186
+0,48
+189
+0,49
+127
+743
+1,93
+554
+1,44
+128
+95
+0,25
+83
+0,22
+129
+––––
+130
+ogó
+ł
+em **
+4 350 063
+11 321,70
+4 114 136
+10 707,66
+131
+u dzieci w wieku 0-14 lat **
+1 869 488
+32 238,48
+1 800 847
+31 054,80
+132
+ró
+ż
+yczka wrodzona 
+UE
+––––
+133
+inne okre
+ś
+lone i nie okre
+ś
+lone
+––––
+134
+toksoplazmoza 
+UE
+25
+6,22
+17
+4,23
+135
+listerioza 
+UE
+1
+0,25
+6
+1,49
+136
+inne okre
+ś
+lone i nie okre
+ś
+lone
+––––
+137
+––––
+138
+14
+0,04
+10
+0,03
+139
+ryby, skorupiaki i inne produkty morza
+––––
+140
+grzyby
+12
+0,03
+24
+0,06
+141
+jagody i inne cz
+ęś
+ci ro
+ś
+lin
+4
+0,01
+3
+0,01
+142
+mikotoksyny
+––––
+143
+dioksyny
+––––
+144
+polichlorowane bifenyle
+––––
+145
+inne okre
+ś
+lone i nie okre
+ś
+lone
+5
+0,01
+–
+–
+146
+1
+0,00
+.
+.
+* wst
+ę
+pne dane; ** dane wg sprawozda
+ń
+ o zachorowaniach i podejrzeniach zachorowa
+ń
+ na gryp
+ę
+; *** rejestracja niepe
+ł
+na
+Bakteryjne zapalenie 
+opon mózgowych 
+i/lub mózgu
+Zatrucia pestycydami – ostre ***
+Zatrucia naturalnie to-
+ksycznymi substanc-
+jami spo
+ż
+ytymi jako 
+pokarm ***
+Choroba wywo
+ł
+ana 
+przez 
+Heamophilus 
+influenzae
+, 
+inwazyjna 
+UE
+Zaka
+ż
+enie wirusem Zika 
+UE 
+***
+Ostre zatrucia 
+ż
+ywno
+ś
+ci
+ą
+ ska
+ż
+on
+ą
+biologicznie i/lub 
+chemicznie ***
+Zapalenie opon mózgowych inne i nie okre
+ś
+lone
+Zapalenie mózgu inne i nie okre
+ś
+lone
+Grypa ptaków typu A/H5 lub A/H5N1 u ludzi 
+UE/PL
+Grypa i podejrzenia 
+grypy 
+UE/PL
+Wrodzone choroby 
+wirusowe
+Inne wrodzone 
+zaka
+ż
+enia i choroby 
+paso
+ż
+ytnicze
+SARS - Zespó
+ł
+ ostrej niewydolno
+ś
+ci oddechowej 
+UE

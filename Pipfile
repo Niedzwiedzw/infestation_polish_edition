@@ -4,8 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pypdf = "*"
+"pypdf2" = "*"
+tabula-py = "*"
+requests = "*"
+"beautifulsoup4" = "*"
 
 [dev-packages]
+ipython = "*"
+pdbpp = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.7"

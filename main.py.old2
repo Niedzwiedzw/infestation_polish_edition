@@ -1,0 +1,236 @@
+from typing import List,Tuple, DefaultDict, Iterable, Union, Generator
+from dataclasses import dataclass, field
+from collections import defaultdict
+import csv
+import argparse
+import os
+from pprint import pprint
+
+import tabula
+
+DEFAULT_OUTPUT = 'csv'
+GROUP_TYPE_NAME = 'razem'
+WEIRD_HYPHEN = '–'
+FILE_ENCODING = 'windows-1250'
+
+parser = argparse.ArgumentParser(
+    description=(
+        'Infestation™ PL-edition™.\n'
+        'CLI utility to provide computer-friendly format for SANEPID™ data.'
+    )
+)
+
+parser.add_argument(
+    '--source',
+    type=str,
+    required=False,
+    help='HTTP link or local path to a file converted. By default all files are downloaded.'
+)
+
+parser.add_argument('--format', type=str, default=DEFAULT_OUTPUT, help=f'output format, defaults to {DEFAULT_OUTPUT}')
+
+parser.add_argument(
+    '--out',
+    type=str,
+    required=False,
+    help='name of output file, defaults to source name with .csv extension'
+)
+
+args = parser.parse_args()
+
+
+class ParsingException(Exception):
+    pass
+
+
+@dataclass
+class Sickness:
+    index: int
+    name: str
+    values: DefaultDict[str, List[float]] = field(default_factory=lambda: defaultdict(list))
+
+
+sicknesses: List[Sickness] = []
+
+
+def add_sickness(sickness: Sickness):
+    print(sickness)
+    sicknesses.append(sickness)
+
+
+def last_sickness() -> Union[Sickness, None]:
+    try:
+        return sicknesses[-1]
+    except IndexError:
+        return None
+
+
+def stripped(rows: Iterable[Iterable[str]]) -> List[List[str]]:
+    return [[col for col in row if col.strip()] for row in rows]
+
+
+def is_subcategory(name: str) -> bool:
+    return name[0].islower()
+
+
+def fix_werid_spacing(values: str) -> Tuple[str]:
+    parsed = ''
+    values = values.split()
+    for i, element in enumerate(values):
+        parsed += element
+        nextval = values[i+1] if values[i+1:] else None
+        if nextval:
+            if len(nextval) == 3 or ('.' in nextval and len(nextval) == 6):
+                pass
+            else:
+                parsed += ' '
+
+    if len(parsed.split()) != 2:
+        return parsed[:-6], parsed[-6:]
+
+    return tuple(parsed.split())
+
+
+def parse_values(values: List[str]) -> List[float]:
+    parsed: List[str] = [piece.replace(WEIRD_HYPHEN, '0.0') for piece in values]
+    parsed = [piece.replace(',', '.') for piece in parsed]
+    parsed = [fix_werid_spacing(piece) if len(piece.split()) != 2 else piece.split() for piece in parsed]
+    parsed: List[float] = [float(value) for piece in parsed for value in piece]
+
+    return parsed
+
+
+def write_to_csv(filename: str, sicknesses_: List[Sickness], date: Tuple[str]):
+    with open(filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Original index', 'Sickness', 'Subcategory'] + [date[0], date[0], date[1], date[1]])
+        for sickness in sicknesses_:
+            for subcategory, values_ in sickness.values.items():
+                print(subcategory, values_)
+                writer.writerow([sickness.index, sickness.name, subcategory] + list(map(str, values_)))
+
+
+def is_main_sickness_name(line: List[str]) -> bool:
+    if len(line) == 3:
+        tablename, values = line[0], line[1:]
+        try:
+            _, name = tablename.split(maxsplit=1)
+
+        except IndexError:
+            return False
+
+        return name[0].isupper()
+
+    return True
+
+
+def is_main_category_line(line: List[str]) -> bool:
+    return line[0][0].isalpha() and line[0][0].isupper()
+
+
+def get_sickness_lines(lines: List[List[str]]) -> Generator[List[List[str]], None, None]:
+    lines = lines[:]
+    from pprint import pprint
+
+    while lines:
+        for i, line in enumerate(lines):
+            if is_main_category_line(line):
+                pass
+            elif is_main_sickness_name(line):
+                chunk = lines[:max(2*i, 1)]
+                yield chunk
+                lines = lines[max(2*i, 1):]
+                break
+
+
+def get_main_category(lines: List[List[str]]) -> str:
+    for line in lines:
+        for value in line:
+            if value[0].isdigit():
+                value = value.split(maxsplit=1)[1]
+            if value[0].isupper():
+                return value
+
+    raise ParsingException('Could not find sickness name')
+
+
+def get_subcategory_and_values(line: List[str]) -> Tuple[int, str, List[float]]:
+    tablename, values = line[0], line[1:]
+    values = parse_values(values)
+    index, name = tablename.split(maxsplit=1)
+    return index, name, values
+
+
+def get_sicknesses(lines: List[List[str]]) -> Generator[Sickness, None, None]:
+    for sickness_lines in get_sickness_lines(lines):
+
+        category = get_main_category(sickness_lines)
+        sickness = Sickness(1, category)
+
+        for line in sickness_lines:
+            if len(line) > 2:
+                index, subcategory, values = get_subcategory_and_values(line)
+                sickness.index = index
+                sickness.values[subcategory] = values
+
+        yield sickness
+
+
+def get_sicknesses_(lines: List[List[str]]) -> List[Sickness]:
+    global sicknesses
+    category = None
+    subcategories: List[List[str]] = []
+    for line in lines:
+        print(line)
+        if len(line) == 3:
+            tablename, values = line[0], line[1:]
+            values = parse_values(values)
+            index, name = tablename.split(maxsplit=1)
+
+            if is_subcategory(name):
+                sickness = last_sickness()
+                sickness.values[name] += values
+            else:
+                sickness = Sickness(index, name)
+                sickness.values[GROUP_TYPE_NAME] += values
+                add_sickness(sickness)
+
+            # pprint(sickness)
+        else:
+            category = line[0]
+            # print(line)
+    # pprint(sicknesses)
+    # pprint(lines)
+
+    # pprint(sicknesses)
+    return sicknesses
+
+
+def main():
+    for source, out in zip(sources, outs):
+        tmpfile = out + '.tmp'
+        tabula.convert_into(source, tmpfile, output_format=format_, pages='all')
+
+        with open(tmpfile) as file:
+            lines = stripped(csv.reader(file, delimiter=','))
+        # os.remove(tmpfile)
+
+        # pprint(lines)
+        # exit(0)
+
+        dates: Tuple[str] = lines[0]
+        print('\t\t', *dates)
+        lines = lines[3:]
+
+        list_sicknesses = list(get_sicknesses(lines))
+
+        write_to_csv(out, list_sicknesses, dates)
+        sicknesses = []
+
+
+if __name__ == '__main__':
+    format_ = args.format
+    sources = [args.source] if args.source else ['test_data/INF_18_10B.pdf']
+    outs = [args.out] if args.out else [o[:-3] + format_ for o in sources]
+
+    main()
