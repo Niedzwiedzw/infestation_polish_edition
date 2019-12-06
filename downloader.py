@@ -2,6 +2,7 @@ import typing as t
 import requests
 import re
 from bs4 import BeautifulSoup
+from subprocess import check_call
 
 YEAR_REGEX = re.compile(r'\d\d\d\d')
 
@@ -45,5 +46,7 @@ def all_pdfs() -> t.Generator[t.Tuple[str, str], None, None]:
 
 
 if __name__ == '__main__':
-    for pdf in all_pdfs():
-        print(pdf)
+    for name, link in all_pdfs():
+        check_call(['curl', link, '-o', f'./downloads/{name}.pdf'])
+
+        print(name, link)

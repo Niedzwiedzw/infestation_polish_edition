@@ -9,6 +9,7 @@ pypdf = "*"
 tabula-py = "*"
 requests = "*"
 "beautifulsoup4" = "*"
+grequests = "*"
 
 [dev-packages]
 ipython = "*"
