@@ -13,6 +13,7 @@ GOOGLE_URL = 'https://vision.googleapis.com/v1/files:annotate'
 def exception_handler(request, exception):
     print("Request failed")
 
+
 def get_token() -> str:
     with open('./token.txt') as f:
         return f.read().strip()

@@ -1,189 +1,367 @@
-from __future__ import annotations
+from os.path import basename
 import typing as t
-import os
-import csv
-import argparse
-from itertools import chain
-import warnings
-warnings.filterwarnings("ignore")
+from dataclasses import dataclass
+from os import listdir
+from json import loads
+from itertools import chain, groupby
+from datetime import datetime, date
 from pprint import pprint
 
-import tabula
+PDF_DIR = './downloads'
 
-from helpers import stripped
-from models import Sickness, ParsingException
-from downloader import all_pdfs
-
-NORMALIZED_LINE_LENGTH = 3
-OUTPUT_DIRECTORY = 'result/'
-DEFAULT_OUTPUT = 'csv'
-WEIRD_HYPHEN = '–'
-NULL_VALUES = [
-    WEIRD_HYPHEN,
-    '.'
-]
-
-parser = argparse.ArgumentParser(
-    description=(
-        'Infestation™ PL-edition™.\n'
-        'CLI utility to provide computer-friendly format for SANEPID™ data.'
-    )
-)
-
-parser.add_argument(
-    '--source',
-    type=str,
-    required=False,
-    help='HTTP link or local path to a file converted. By default all files are downloaded.'
-)
-
-parser.add_argument('--format', type=str, default=DEFAULT_OUTPUT, help=f'output format, defaults to {DEFAULT_OUTPUT}')
-
-parser.add_argument(
-    '--out',
-    type=str,
-    required=False,
-    help='name of output file, defaults to source name with .csv extension'
-)
-
-args = parser.parse_args()
+Vertex = (float, float)
+BoxVertices = (Vertex, Vertex, Vertex, Vertex)
+PRECISION = 2
+PRINT_SCALE = 0.5
 
 
-def starts_with_index(word: str) -> bool:
-    return word.split()[0].isdigit()
+def to_vertices(vertice_raw: t.Dict[str, float]) -> Vertex:
+    return vertice_raw['x'], vertice_raw['y']
 
 
-def get_valid_lines(lines: t.List[t.List[str]]) -> t.Generator[t.List[str], None, None]:
-    def _valid_lines():
-        for line in lines:
-            if starts_with_index(line[0]):
-                if line[0].strip()[0].isdigit():
-                    fullname, *rest = line
-                    for i, element in enumerate(rest):
-                        if element[0].isalpha():
-                            fullname += ' ' + element
-                        else:
-                            newline = [fullname, *rest[i:]]
-                            yield newline
-                            break
-                else:
-                    yield line
-
-    for line in _valid_lines():
-        if len(line) == 2:
-            name, values = line
-            fixed_values = reformat_weird_spacing(values).split()
-            vals_1, vals_2 = fixed_values[:2], fixed_values[2:]
-            yield [name, ' '.join(vals_1), ' '.join(vals_1)]
-
-        if not len(line) == NORMALIZED_LINE_LENGTH:
-            raise ParsingException(f'{line} has ircorrect length (expected {NORMALIZED_LINE_LENGTH}')
-        yield line
+def parse_date(raw: str) -> datetime:
+    return datetime.strptime(raw, '%d.%m.%Y')
 
 
-def reformat_weird_spacing(values: str) -> str:
-    parsed = ''
-    values = values.split()
-    for i, element in enumerate(values):
-        parsed += element
-        nextval = values[i + 1] if values[i + 1:] else None
-        if nextval:
-            if len(nextval) == 3 or ('.' in nextval and len(nextval) == 6):
-                pass
-            else:
-                parsed += ' '
-
-    return parsed
+def avg(x: t.Union[float, int], y: t.Union[float, int]) -> float:
+    return (x + y) / 2
 
 
-def fix_werid_spacing(values: str) -> t.Tuple[str, str]:
-    parsed = reformat_weird_spacing(values)
+@dataclass(frozen=True, eq=True)
+class VerticesMixin:
+    raw: t.Dict[str, t.Any]
 
-    if len(parsed.split()) != 2:
-        return parsed[:-6], parsed[-6:]
+    @property
+    def vertices(self) -> BoxVertices:
+        """
+        :return: (left-top, right-top, right-bottom, left-bottom)
+        """
+        return list(map(to_vertices, self.raw['boundingBox']['normalizedVertices']))
 
-    return tuple(parsed.split())
+    @property
+    def _y_positions(self) -> t.Iterable[float]:
+        return (y for x, y in self.vertices)
+
+    @property
+    def _x_positions(self) -> t.Iterable[float]:
+        return (x for x, y in self.vertices)
+
+    @property
+    def pos_top(self) -> float:
+        return min(self._y_positions)
+
+    @property
+    def pos_bottom(self) -> float:
+        return max(self._y_positions)
+
+    @property
+    def pos_left(self) -> float:
+        return min(self._x_positions)
+
+    @property
+    def pos_right(self) -> float:
+        return max(self._x_positions)
+
+    @property
+    def pos_x(self) -> float:
+        return round(avg(self.pos_left, self.pos_right), PRECISION)
+
+    @property
+    def pos_y(self) -> float:
+        return round(avg(self.pos_bottom, self.pos_top), PRECISION)
+
+    @property
+    def vertex_topleft(self):
+        return self.vertices[0]
+
+    @property
+    def vertex_bottomleft(self):
+        return self.vertices[3]
+
+    @property
+    def vertex_topright(self):
+        return self.vertices[1]
+
+    @property
+    def vertex_bottomright(self):
+        return self.vertices[2]
+
+    @property
+    def width(self) -> float:
+        return self.pos_right - self.pos_left
+
+    @property
+    def height(self):
+        return self.pos_bottom - self.pos_top
+
+    @property
+    def center(self) -> Vertex:  # to a global precision
+        return self.pos_x, self.pos_y
 
 
-def parse_values(values: t.List[str]) -> t.List[float]:
-    parsed = values[:]
-    for null_value in NULL_VALUES:
-        parsed: t.List[str] = [piece.replace(null_value, '0.0') for piece in parsed]
-    parsed = [piece.replace(',', '.') for piece in parsed]
-    parsed = [fix_werid_spacing(piece) if len(piece.split()) != 2 else piece.split() for piece in parsed]
-    parsed: t.List[float] = [float(value) for piece in parsed for value in piece]
+@dataclass(frozen=True, eq=True)
+class Symbol(VerticesMixin):
+    raw: t.Dict[str, t.Any]
 
-    return parsed
+    @property
+    def confidence(self) -> float:
+        return self.raw['confidence']
 
+    @property
+    def _text(self) -> str:
+        return self.raw['text']
 
-def parse_line(line: t.List[str]) -> t.Tuple[int, str, t.Tuple[float]]:
-    tablename, values = line[0], line[1:]
-    values = tuple(parse_values(values))
-    index, fieldname = tablename.split(maxsplit=1)
-    return index, fieldname, values
+    def __repr__(self):
+        return f'<Symbol "{self._text}">'
 
-
-def skip(iterable: t.Iterator, times: int) -> t.Iterator:
-    for _ in range(times):
-        next(iterable)
-
-    return iterable
+    def __str__(self):
+        return self._text
 
 
-def load_sicknesses(filename: str) -> t.Generator[Sickness, None, None]:
-    tmpfile = filename.rsplit('/')[-1] + '.tmp'
-    tabula.convert_into(filename, tmpfile, output_format=format_, pages='all', silent=True)
+@dataclass(frozen=True, eq=True)
+class Word(VerticesMixin):
+    raw: t.Dict[str, t.Any]
 
-    with open(tmpfile) as file:
-        lines = stripped(csv.reader(file, delimiter=','))
-    os.remove(tmpfile)
+    @property
+    def symbols(self) -> t.List[Symbol]:
+        return list(map(Symbol, self.raw['symbols']))
 
-    this_year, last_year = lines[0]
-    valid_lines = get_valid_lines(lines[3:])
+    @property
+    def _text(self) -> str:
+        return ''.join(map(str, self.symbols))
 
-    for line in valid_lines:
-        index, name, values = parse_line(line)
-        main_name = name if name[0].isupper() else None
-        subcategory = name if not main_name else 'razem'
-        args = int(index), main_name, subcategory, values, this_year, last_year
+    def __repr__(self):
+        return f'<Word: {self._text}>'
 
-        yield Sickness(*args)
+    def __str__(self):
+        return self._text
 
 
-def write_to_csv(filename: str, sicknesses: t.Generator[Sickness, None, None]):
-    with open(filename, 'w', newline='') as file:
-        writer = csv.writer(file)
-        first = next(sicknesses)
-        writer.writerow(
-            ['id', 'Sickness', 'Subcategory', first.this_year, first.this_year, first.last_year, first.last_year]
-        )
-        for sickness in chain([first], sicknesses):
-            writer.writerow(
-                [
-                    sickness.index,
-                    sickness.name,
-                    sickness.subcategory,
-                    *sickness.values
-                ]
-            )
+@dataclass(frozen=True, eq=True)
+class Paragraph(VerticesMixin):
+    raw: t.Dict[str, t.Any]
+
+    @property
+    def words(self) -> t.List[Word]:
+        return list(map(Word, self.raw['words']))
+
+    @property
+    def confidence(self) -> float:
+        return self.raw['confidence']
+
+    @property
+    def _text(self):
+        return ' '.join(map(str, self.words))
+
+    def __repr__(self):
+        return f'<Paragraph at {self.vertices}: "{self._text}">'
+
+    def __str__(self):
+        return self._text
+
+
+@dataclass(frozen=True, eq=True)
+class Block(VerticesMixin):
+    raw: t.Dict[str, t.Any]
+
+    @property
+    def paragraphs(self):
+        return list(map(Paragraph, self.raw['paragraphs']))
+
+    @property
+    def block_type(self) -> str:
+        return self.raw['blockType']
+
+    @property
+    def confidence(self) -> float:
+        return self.raw['confidence']
+
+    def __repr__(self):
+        return f'<Block {self.vertices}, ({len(self.paragraphs)} paragraphs)>'
+
+
+@dataclass(frozen=True, eq=True)
+class Annotation:
+    raw: t.Dict[str, t.Any]
+
+    @property
+    def width(self) -> int:
+        return self.raw['width']
+
+    @property
+    def height(self) -> int:
+        return self.raw['height']
+
+    @property
+    def confidence(self) -> float:
+        return self.raw['confidence']
+
+    @property
+    def blocks(self) -> t.List[Block]:
+        return list(map(Block, self.raw['blocks']))
+
+    def __repr__(self):
+        return f'<Annotation: width={self.width} height={self.height} confidence={self.confidence}>'
+
+
+@dataclass(frozen=True, eq=True)
+class Line(VerticesMixin):
+    raw: t.List[Word]
+
+    @property
+    def words(self) -> t.List[Word]:
+        return list(sorted(self.raw, key=lambda w: w.pos_x))
+
+    @property
+    def vertices(self) -> BoxVertices:  # override - this is an aggregation object
+        """
+        :return: (left-top, right-top, right-bottom, left-bottom)
+        """
+        top = self.words[0].pos_top
+        bottom = self.words[0].pos_bottom
+        left = self.words[0].pos_left
+        right = self.words[-1].pos_right
+
+        return (left, top), (right, top), (right, bottom), (left, bottom)
+
+    @property
+    def _char_width(self):
+        return self.width / len(self._text)
+
+    @property
+    def _text(self) -> str:
+        return ' '.join(map(str, self.words))
+
+    @property
+    def padding(self) -> int:
+        return int(PRINT_SCALE * self.pos_left / self._char_width)
+
+    def __repr__(self):
+        return f'<Line>'
+
+    def __str__(self):
+        return self.padding * ' ' + self._text
+
+
+@dataclass(frozen=True, eq=True)
+class Page:
+    filename: str
+    raw: t.Dict[str, t.Any]
+
+    def __repr__(self) -> str:
+        return f'<Page #{self.pagenum} of {self.filename}>'
+
+    @property
+    def _context(self) -> t.Dict[str, t.Any]:
+        return self.raw['context']
+
+    @property
+    def _data(self) -> t.Dict[str, t.Any]:
+        return self.raw['fullTextAnnotation']
+
+    @property
+    def pagenum(self) -> int:
+        return self._context['pageNumber']
+
+    @property
+    def text(self) -> str:
+        return self._data['text']
+
+    @property
+    def _annotations(self) -> t.List[Annotation]:
+        return list(map(Annotation, self._data['pages']))
+
+    @property
+    def paragraphs(self) -> t.List[Paragraph]:
+        annotations = self._annotations
+        blocks: t.Iterable[Block] = chain(*(a.blocks for a in annotations))
+        return list(chain(*(b.paragraphs for b in blocks)))
+
+    @property
+    def words(self) -> t.List[Word]:
+        return list(chain(*((paragraph.words for paragraph in self.paragraphs))))
+
+    @property
+    def lines(self) -> t.Generator[Line, None, None]:
+        by = lambda word: word.pos_y
+        words = sorted(self.words, key=by)
+        lines = groupby(words, key=by)
+
+        for key, line in lines:
+            yield Line(list(line))
+
+
+@dataclass(frozen=True, eq=True)
+class ReportFile:
+    pdf_path: str
+
+    @property
+    def pdf_name(self) -> str:
+        return basename(self.pdf_path)
+
+    @property
+    def _base_name(self) -> str:
+        return self.pdf_name.rsplit('.', 1)[0]
+
+    @property
+    def _dates_raw(self):
+        return self._base_name.split('-')
+
+    @property
+    def _date_raw_start(self):
+        return self. _dates_raw[0]
+
+    @property
+    def _date_raw_end(self):
+        return self. _dates_raw[1]
+
+    @property
+    def start_date(self):
+        return parse_date(self._date_raw_start)
+
+    @property
+    def end_date(self):
+        return parse_date(self._date_raw_end)
+
+    @property
+    def _json_path(self) -> str:
+        return f'./result/{self._base_name}.json'
+
+    @property
+    def _json_data(self) -> t.Dict[str, t.Any]:
+        with open(self._json_path) as f:
+            return loads(f.read())
+
+    @property
+    def _pages_data(self):
+        return self._json_data['responses'][0]['responses']
+
+    @property
+    def pages(self) -> t.List[Page]:
+        return [Page(self._json_path, raw) for raw in self._pages_data]
+
+    def __repr__(self):
+        return f'<ReportFile: {self.pdf_path} ({len(self.pages)} pages)>'
 
 
 def main():
-    current_files = os.listdir(OUTPUT_DIRECTORY)
-
-    for date, link in all_pdfs():
-        filename = f'{date}.csv'
-        print(f'{date}... ', end='')
-        if filename not in current_files:
-            write_to_csv(f'{OUTPUT_DIRECTORY}{filename}', load_sicknesses(link))
-            print('DONE')
-        else:
-            print('ALREADY EXISTS')
+    report_files = sorted(list(map(ReportFile, listdir(PDF_DIR))), key=lambda r: r.end_date)
+    f = report_files[0]
+    # page: Page = f.pages[0]
+    # print(page.text)
+    # a = page._annotations[0]
+    # block = a.blocks[0]
+    # paragraph = block.paragraphs[0]
+    # print(paragraph.raw.keys())
+    #
+    # word = paragraph.words[0]
+    # print(word)
+    # print(paragraph.raw.keys())
+    print(f)
+    for page in f.pages:
+        for line in page.lines:
+            print(line)
 
 
 if __name__ == '__main__':
-    format_ = args.format
-    sources = [args.source] if args.source else ['test_data/INF_18_10B.pdf']
-    outs = [args.out] if args.out else [o[:-3] + format_ for o in sources]
-
     main()
