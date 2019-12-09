@@ -8,7 +8,8 @@ from datetime import datetime
 Vertex = (float, float)
 BoxVertices = (Vertex, Vertex, Vertex, Vertex)
 PRECISION = 2
-PRINT_SCALE = 0.5
+PRINT_SCALE = 0.05
+EMPTY_VERTICES: BoxVertices = ((0, 0), (0, 0), (0, 0), (0, 0))
 
 
 def to_vertices(vertex_raw: t.Dict[str, float]) -> Vertex:
@@ -32,7 +33,10 @@ class VerticesMixin:
         """
         :return: (left-top, right-top, right-bottom, left-bottom)
         """
-        return list(map(to_vertices, self.raw['boundingBox']['normalizedVertices']))
+        try:
+            return list(map(to_vertices, self.raw['boundingBox']['normalizedVertices']))
+        except KeyError:
+            return EMPTY_VERTICES
 
     @property
     def _y_positions(self) -> t.Iterable[float]:
@@ -125,6 +129,14 @@ class Word(VerticesMixin):
     @property
     def _text(self) -> str:
         return ''.join(map(str, self.symbols))
+
+    @property
+    def _char_width(self):
+        return self.width / len(self._text)
+
+    @property
+    def padding(self) -> int:
+        return int(PRINT_SCALE * self.pos_left / self._char_width)
 
     def __repr__(self):
         return f'<Word: {self._text}>'
@@ -228,15 +240,24 @@ class Line(VerticesMixin):
     def _text(self) -> str:
         return ' '.join(map(str, self.words))
 
-    @property
-    def padding(self) -> int:
-        return int(PRINT_SCALE * self.pos_left / self._char_width)
-
     def __repr__(self):
         return f'<Line>'
 
     def __str__(self):
-        return self.padding * ' ' + self._text
+        return self._text
+
+
+@dataclass(frozen=True, eq=True)
+class PaddedLine:
+    line: Line
+    char_width: float
+
+    @property
+    def _text(self) -> str:
+        return str(self.line)
+
+    def __str__(self) -> str:
+        return ' ' * round(PRINT_SCALE * self.line.pos_left / self.char_width) + self._text
 
 
 @dataclass(frozen=True, eq=True)
